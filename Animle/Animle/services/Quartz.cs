@@ -29,7 +29,7 @@ namespace Animle.NewFolder
                     trigger.ForJob(daily).WithCronSchedule("0 0 * * * ?");
                 });
 
-          
+
                 options.AddJob<WeeklyJob>(weekly).AddTrigger(trigger =>
                 {
                     trigger.ForJob(weekly).WithCronSchedule("0 0 * * MON ?");
