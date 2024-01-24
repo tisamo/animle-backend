@@ -32,7 +32,7 @@ namespace Animle.NewFolder
 
                 options.AddJob<WeeklyJob>(weekly).AddTrigger(trigger =>
                 {
-                    trigger.ForJob(weekly).WithCronSchedule("0 0 * * MON ?");
+                    trigger.ForJob(weekly).WithCronSchedule("0 0 * * 1 ?");
                 });
             });
             services.AddQuartzHostedService();

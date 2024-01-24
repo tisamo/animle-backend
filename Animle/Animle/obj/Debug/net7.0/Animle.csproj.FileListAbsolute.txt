@@ -5,7 +5,6 @@ C:\Users\krstf\source\repos\kek\Animle\Animle\obj\Debug\net7.0\Animle.AssemblyIn
 C:\Users\krstf\source\repos\kek\Animle\Animle\obj\Debug\net7.0\Animle.csproj.CoreCompileInputs.cache
 C:\Users\krstf\source\repos\kek\Animle\Animle\obj\Debug\net7.0\Animle.MvcApplicationPartsAssemblyInfo.cs
 C:\Users\krstf\source\repos\kek\Animle\Animle\obj\Debug\net7.0\Animle.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\krstf\source\repos\kek\Animle\Animle\bin\Debug\net7.0\appsettings.Development.json
 C:\Users\krstf\source\repos\kek\Animle\Animle\bin\Debug\net7.0\appsettings.json
 C:\Users\krstf\source\repos\kek\Animle\Animle\bin\Debug\net7.0\Animle.exe
 C:\Users\krstf\source\repos\kek\Animle\Animle\bin\Debug\net7.0\Animle.deps.json
