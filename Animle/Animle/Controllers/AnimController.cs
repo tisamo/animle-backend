@@ -118,7 +118,11 @@ namespace Animle.Controllers
                 return Unauthorized(Response);
             }
 
-            User user = _tokenService.GetUser(_animleConect, claims);
+
+            var userNameClaim = claims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
+
+
+            User user = _animleConect.Users.Include(u => u.GameContests).FirstOrDefault(u => u.Name == userNameClaim.Value);
 
             if (user == null)
             {
