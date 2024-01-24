@@ -10,7 +10,6 @@ namespace Animle.services
             HttpClient client = new HttpClient();
 
             apiUrl += subUrl;
-            Console.WriteLine(apiUrl);
 
             try
             {
@@ -27,14 +26,12 @@ namespace Animle.services
                 }
                 else
                 {
-                    Console.WriteLine($"Error: {response.StatusCode} - {response.ReasonPhrase}");
                     return null;
 
                 }
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine($"Request Exception: {e.Message}");
                 return null;
             }
             finally

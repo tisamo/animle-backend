@@ -89,10 +89,8 @@ public class SignarlRHub : Hub
 
         user.PlayerWaitingForMatch = false;
         opponent.PlayerWaitingForMatch = false;
-
         user.opponent = opponent;
         opponent.opponent = user;
-        Console.WriteLine(_signalrAnimeService.GetList().Count);   
         List<AnimeFilter> anim = _signalrAnimeService.GetList().Select(x => new AnimeFilter
         {
             Id = x.Id,
@@ -125,13 +123,10 @@ public class SignarlRHub : Hub
     public async Task Next()
     {
         Player user = users.FirstOrDefault((u => u.ConnectionId == Context.ConnectionId));
-        Console.WriteLine(user.ConnectionId);
-        Console.WriteLine(user.opponent.ConnectionId);
-
         if (user != null)
         {
-            await Clients.Client(user.ConnectionId).SendAsync("nextQuestion", "opponent not found");
-            await Clients.Client(user.opponent.ConnectionId).SendAsync("nextQuestion", "opponent not found");
+            await Clients.Client(user.ConnectionId).SendAsync("nextQuestion");
+            await Clients.Client(user.opponent.ConnectionId).SendAsync("nextQuestion");
 
         };
 

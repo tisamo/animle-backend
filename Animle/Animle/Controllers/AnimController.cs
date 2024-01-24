@@ -68,10 +68,7 @@ namespace Animle.Controllers
 
             User user = _animleConect.Users.Include(u => u.GameContests).FirstOrDefault(u => u.Name == userNameClaim.Value);
           
-            user.GameContests.ForEach((u) =>
-            {
-                Console.WriteLine(u.Id);
-            });
+          
             if (user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
             {
                 simpleResponse.Response = "You have already played this game";
@@ -79,7 +76,6 @@ namespace Animle.Controllers
                 return BadRequest(simpleResponse);
             }
 
-            Console.WriteLine(user.GameContests.Count);
 
 
             if (dailyAnimes == null)
@@ -218,12 +214,6 @@ namespace Animle.Controllers
 
 
             return Ok("kek");
-
-
-
-
-
-
 
 
         }

@@ -16,8 +16,7 @@ public static class EmailService
 
         var emailMessage = new MimeMessage();
 
-        Console.WriteLine(email );
-        Console.WriteLine(emailPass );
+    
 
         if(emailDto.From != null)
         {

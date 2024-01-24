@@ -1,4 +1,4 @@
-﻿namespace Animle.Controllers
+﻿amespace Animle.Controllers
 {
     public class UserDto
     {

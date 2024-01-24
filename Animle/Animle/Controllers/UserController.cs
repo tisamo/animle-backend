@@ -15,7 +15,6 @@ namespace StoryTeller.Controllers
     public class UserController : ControllerBase
     {
 
-
         private readonly ILogger<UserController> _logger;
 
         private readonly TokenService _tokenService;
