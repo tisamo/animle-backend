@@ -14,6 +14,9 @@ public static class EmailService
 
         string emailPass = configuration.GetSection("AppSettings:EmailPassword").Value;
 
+        string gSercret = configuration.GetSection("AppSettings:GmailSecret").Value;
+
+
         var emailMessage = new MimeMessage();
 
     
@@ -34,7 +37,7 @@ public static class EmailService
             client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
             client.Connect("smtp.gmail.com", 587, false);
-            client.Authenticate(email, "juvp bbsj glqq hkxe");
+            client.Authenticate(email, gSercret);
 
             client.Send(emailMessage);
             client.Disconnect(true);

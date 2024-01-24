@@ -32,7 +32,7 @@ namespace Animle.services
             builder.Services.AddHttpClient();
             builder.Services.AddDbContext<AnimleDbContext>(options =>
             {
-             string dbConnect = configuration.GetSection("AppSettings:DbConnection").Value;
+            string dbConnect = configuration.GetSection("AppSettings:DbConnection").Value;
             options.UseMySql(dbConnect, ServerVersion.AutoDetect(dbConnect));
 
         });

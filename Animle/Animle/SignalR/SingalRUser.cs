@@ -19,6 +19,6 @@ namespace Animle.Models
     public Player opponent { get; set; } = null;
     public bool IsPlaying { get; set; } = false;
 
-        public int? QuizId { get; set; } = null;
+    public int? QuizId { get; set; } = null;
     }
 }
