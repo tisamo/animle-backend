@@ -19,10 +19,21 @@ namespace Animle.NewFolder
                 {
                     trigger.ForJob(monthly).WithCronSchedule("* * 1 * * ?");
                 });
-               options.AddJob<MonthlyJob>(instant).AddTrigger(trigger =>
+
+                options.AddJob<MonthlyJob>(instant).AddTrigger(trigger =>
                 {
-                   trigger.ForJob(instant).StartNow();
-               });
+                    trigger.ForJob(instant).StartNow();
+                });
+                options.AddJob<DailyJob>(daily).AddTrigger(trigger =>
+                {
+                    trigger.ForJob(daily).WithCronSchedule("0 0 * * * ?");
+                });
+
+          
+                options.AddJob<WeeklyJob>(weekly).AddTrigger(trigger =>
+                {
+                    trigger.ForJob(weekly).WithCronSchedule("0 0 * * MON ?");
+                });
             });
             services.AddQuartzHostedService();
         }

@@ -133,7 +133,7 @@ namespace Animle.Controllers
                 GameContest game = new GameContest();
                 game.gameGuid = new Guid(gameResult.GameId);
                 game.Points = gameResult.Result;
-                game.Type = "daily";
+                game.Type = dailyAnimes.Type;
                 game.TimePlayed = DateTime.Now;
                 game.User = user;
                 user.GameContests.Add(game);

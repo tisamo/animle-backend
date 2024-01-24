@@ -126,14 +126,14 @@ namespace Animle.services
         }
     }
 
-    public class Weekly : IJob
+    public class WeeklyJob : IJob
     {
 
         private RequestCacheManager cacheManager;
         private AnimleDbContext _animle;
 
 
-        public Weekly(RequestCacheManager requestCacheManager, AnimleDbContext anime)
+        public WeeklyJob(RequestCacheManager requestCacheManager, AnimleDbContext anime)
         {
             cacheManager = requestCacheManager;
             _animle = anime;
