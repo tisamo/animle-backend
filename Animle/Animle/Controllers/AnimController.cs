@@ -162,9 +162,6 @@ namespace Animle.Controllers
         [Route("filter")]
         public async Task<IActionResult> SearchAnime([FromQuery] string q)
         {
-
-
-
             List<AnimeFilter> filteredList = _animleConect.AnimeWithEmoji.Where(x => x.JapaneseTitle.ToLower().Contains(q) || x.Title.ToLower().Contains(q))
                .Select(x => new AnimeFilter
                {
@@ -190,13 +187,9 @@ namespace Animle.Controllers
         [Route("Random")]
         public IActionResult Random()
         {
-            var sentAnimes = new List<AnimeFilter>();
-            var cachedAnimes = _cacheManager.GetCachedItem<List<AnimeFilter>>("random");
-            Random rnd = new Random();
-            if (cachedAnimes == null)
-            {
 
-                List<AnimeFilter> anim = _animleConect.AnimeWithEmoji.Select(x => new AnimeFilter
+                Random rnd = new Random();    
+                List<AnimeFilter> anim = _animleConect.AnimeWithEmoji.ToList().OrderBy(item=> rnd.Next()).Take(10).Select(x => new AnimeFilter
                 {
                     Id = x.Id,
                     Title = x.Title,
@@ -207,31 +200,14 @@ namespace Animle.Controllers
                     EmojiDescription = x.EmojiDescription,
                     MyanimeListId = x.MyanimeListId,
                 }).ToList();
-                _cacheManager.SetCacheItem("random", anim, TimeSpan.FromDays(31));
-                for (int i = 0; i < 10; i++)
-                {
-                    int random = rnd.Next(0, anim.Count - 1);
-                    int gameType = rnd.Next(0, 3);
-                    AnimeFilter animeWithEmoji = anim[random];
-                    animeWithEmoji.Type = UtilityService.GetTypeByNumber(gameType);
-                    sentAnimes.Add(animeWithEmoji);
-                }
-                return Ok(sentAnimes);
+                      anim.ForEach((a) =>
+                     {
+                     int random = rnd.Next(0, anim.Count - 1);
+                     int gameType = rnd.Next(0, 3);
+                     a.Type = UtilityService.GetTypeByNumber(gameType);
+                  });
 
-            }
-            else
-            {
-                for (int i = 0; i < 10; i++)
-                {
-                    int random = rnd.Next(0, cachedAnimes.Count - 1);
-                    int gameType = rnd.Next(0, 3);
-                    AnimeFilter animeWithEmoji = cachedAnimes[random];
-                    animeWithEmoji.Type = UtilityService.GetTypeByNumber(gameType);
-                    sentAnimes.Add(animeWithEmoji);
-                }
-                return Ok(sentAnimes);
-            }
-
+            return Ok(anim);
         }
 
         [HttpGet]

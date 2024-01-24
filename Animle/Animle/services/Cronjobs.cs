@@ -14,10 +14,13 @@ namespace Animle.services
 
         private AnimleDbContext _animle;
 
-        public MonthlyJob(RequestCacheManager requestCacheManager, AnimleDbContext animle)
+        private SignalrAnimeService _signalrAnimeService;
+
+        public MonthlyJob(RequestCacheManager requestCacheManager, AnimleDbContext animle, SignalrAnimeService signalrAnimeService)
         {
             cacheManager = requestCacheManager;
             _animle = animle;
+            _signalrAnimeService = signalrAnimeService;
         }
 
 
@@ -29,6 +32,8 @@ namespace Animle.services
             List<AnimeWithEmoji> animes = _animle.AnimeWithEmoji.ToList();
 
             cacheManager.SetCacheItem("monthly", animes, TimeSpan.FromDays(31));
+
+            _signalrAnimeService.SetList(animes);
 
             List<AnimeWithEmoji> weeklyAnime = new List<AnimeWithEmoji>(animes.OrderBy((item) => rnd.Next()).Take(25));
 

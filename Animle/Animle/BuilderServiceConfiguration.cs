@@ -42,7 +42,8 @@ namespace Animle.services
             builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             builder.Services.AddSingleton<RequestCacheManager>();
-          //  builder.Services.AddSingleton<ISessionFactory>(sessionFactory);
+            builder.Services.AddSingleton<SignalrAnimeService>();
+            //  builder.Services.AddSingleton<ISessionFactory>(sessionFactory);
             builder.Services.AddSingleton<TokenService>(provider =>
             {
                 var secretKey = configuration.GetSection("AppSettings:SecretKey").Value;

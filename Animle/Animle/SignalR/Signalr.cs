@@ -10,11 +10,13 @@ public class SignarlRHub : Hub
     private readonly TokenService _tokenService;
     private readonly AnimleDbContext _context;
     public static List<Player> users = new List<Player>();
+    private readonly SignalrAnimeService _signalrAnimeService;
 
-    public SignarlRHub(AnimleDbContext context, TokenService tokenService)
+    public SignarlRHub(AnimleDbContext context, TokenService tokenService, SignalrAnimeService signalrAnimeService)
     {
         _context = context;
         _tokenService = tokenService;
+        _signalrAnimeService = signalrAnimeService;
     }
     public override Task OnConnectedAsync()
     {
@@ -23,16 +25,20 @@ public class SignarlRHub : Hub
     public override async Task OnDisconnectedAsync(Exception exception)
     {
        var user =  users.FirstOrDefault((u => u.ConnectionId == Context.ConnectionId));
-        if(user.opponent != null)
+        if (user == null)
+        {
+            return;
+        }
+  
+        if (user.opponent != null)
         {
             await Clients.Client(user.opponent.ConnectionId).SendAsync("opponentDisconnected");
 
         }
-        if (user != null)
-        {
-            users.Remove(user);
-            await _context.SaveChangesAsync();
-        }
+       
+
+        users.Remove(user);
+        await _context.SaveChangesAsync();
 
         await base.OnDisconnectedAsync(exception);
     }
@@ -72,8 +78,7 @@ public class SignarlRHub : Hub
             return;
         };
 
-        var opponent = users.Where(u => u.PlayerWaitingForMatch && u.ConnectionId != Context.ConnectionId 
-                                              ).OrderBy((x=> new Guid())).FirstOrDefault();
+        var opponent = users.Where(u => u.PlayerWaitingForMatch && u.ConnectionId != Context.ConnectionId).OrderBy((x=> new Guid())).FirstOrDefault();
 
         if (opponent == null)
         {
@@ -87,8 +92,8 @@ public class SignarlRHub : Hub
 
         user.opponent = opponent;
         opponent.opponent = user;
-
-        List<AnimeFilter> anim = _context.AnimeWithEmoji.Select(x => new AnimeFilter
+        Console.WriteLine(_signalrAnimeService.GetList().Count);   
+        List<AnimeFilter> anim = _signalrAnimeService.GetList().Select(x => new AnimeFilter
         {
             Id = x.Id,
             Title = x.Title,
@@ -98,7 +103,7 @@ public class SignarlRHub : Hub
             properties = x.properties,
             EmojiDescription = x.EmojiDescription,
             MyanimeListId = x.MyanimeListId,
-        }).Take(2).ToList();
+        }).Take(10).ToList();
 
         Random rnd = new Random();
         anim.ForEach((a) =>
@@ -110,8 +115,6 @@ public class SignarlRHub : Hub
 
         });
       
-
-
         await Clients.Client(user.ConnectionId).SendAsync("opponentFound", anim);
         await Clients.Client(opponent.ConnectionId).SendAsync("opponentFound", anim);
 
@@ -138,7 +141,6 @@ public class SignarlRHub : Hub
     {
         Player user = users.FirstOrDefault((u => u.ConnectionId == Context.ConnectionId));
         user.Result = result;
-        Console.WriteLine(user.Result);
         if (user.Result != null && user.opponent.Result != null)
         {
             GameEndResult userResponse = new GameEndResult();
@@ -150,7 +152,8 @@ public class SignarlRHub : Hub
           
             await Clients.Client(user.ConnectionId).SendAsync("gameResult", userResponse);
             await Clients.Client(user.opponent.ConnectionId).SendAsync("gameResult", oppoentResoponse);
-
+            users.Remove(user);
+            users.Remove(user.opponent);
         };
 
     }

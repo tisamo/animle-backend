@@ -27,7 +27,7 @@ app.UseAuthorization();
 
 var connection = new HubConnectionBuilder()
                 .WithUrl("https://localhost:7020/gameHub")
-                .WithAutomaticReconnect();
+                .WithAutomaticReconnect(new SignalRRetryPolicy());
 
 
 app.UseRouting();
