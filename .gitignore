@@ -1,0 +1,15 @@
+﻿################################################################################
+# This .gitignore file was automatically created by Microsoft(R) Visual Studio.
+################################################################################
+
+/Animle/Animle/bin/Debug/net7.0/Animle.dll
+/Animle/Animle/bin/Debug/net7.0/Animle.pdb
+/Animle/.vs/ProjectEvaluation/animle.projects.v5.2
+/Animle/.vs/ProjectEvaluation/animle.metadata.v5.2
+/Animle/.vs/Animle/v17/.suo
+/Animle/.vs/Animle/v17/.futdcache.v2
+/Animle/.vs/Animle/DesignTimeBuild/.dtbcache.v2
+/Animle/Animle/obj/Debug/net7.0/ref/Animle.dll
+/Animle/Animle/obj/Debug/net7.0/Animle.pdb
+/Animle/Animle/obj/Debug/net7.0/Animle.dll
+/Animle/Animle/obj/Debug/net7.0/Animle.csproj.CoreCompileInputs.cache
