@@ -1,0 +1,14 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\Animle",
+    "\\Animle\\Controllers",
+    "\\Animle\\interfaces",
+    "\\Animle\\Migrations",
+    "\\Animle\\Models",
+    "\\Animle\\Properties",
+    "\\Animle\\Quartz"
+  ],
+  "SelectedNode": "\\Animle\\Animle.csproj",
+  "PreviewInSolutionExplorer": false
+}
