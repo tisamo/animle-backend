@@ -71,24 +71,17 @@ namespace Animle.Controllers
 
             if (dailyAnimes == null)
             {
-                  if (user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
-                {
-                    simpleResponse.Response = "You have already played this game";
-
-                    return BadRequest(simpleResponse);
-                }
                 Random rnd = new Random();
                 dailyAnimes = new ContestGame();
                 dailyAnimes.Anime = new List<AnimeWithEmoji>(_animleConect.AnimeWithEmoji.OrderBy((item) => rnd.Next()).Take(15));
                 dailyAnimes.Anime.ForEach((a) =>
                 {
                     int gameType = rnd.Next(0, 3);
-                    AnimeWithEmoji animeWithEmoji = a;
-                    animeWithEmoji.Type = UtilityService.GetTypeByNumber(gameType);
-                    dailyAnimes.Anime.Add(animeWithEmoji);
+                    a.Type = UtilityService.GetTypeByNumber(gameType);
                 });
                 _cacheManager.SetCacheItem("daily", dailyAnimes, TimeSpan.FromDays(1));
-            } else
+            }
+                 else
             {
 
                 if (user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
