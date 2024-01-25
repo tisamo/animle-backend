@@ -11,17 +11,6 @@ namespace Animle.services
     public static class UtilityService
     {
 
-        public static bool RandomIndex(List<int> numbers, int random)
-        {
-            if (!numbers.Contains(random))
-            {
-                numbers.Add(random);
-                return true;
-            }
-            return false;
-
-        }
-
         public static string GetTypeByNumber(int number)
         {
             switch (number)

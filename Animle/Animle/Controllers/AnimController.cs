@@ -61,25 +61,22 @@ namespace Animle.Controllers
                 simpleResponse.Response = "Token invalid";
                 return Unauthorized(Response);
             }
-            ContestGame dailyAnimes = _cacheManager.GetCachedItem<ContestGame>("daily");
-
             var userNameClaim = claims.FindFirst(c => c.Type == ClaimTypes.NameIdentifier);
 
 
             User user = _animleConect.Users.Include(u => u.GameContests).FirstOrDefault(u => u.Name == userNameClaim.Value);
-          
-          
-            if (user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
-            {
-                simpleResponse.Response = "You have already played this game";
 
-                return BadRequest(simpleResponse);
-            }
-
+            ContestGame dailyAnimes = _cacheManager.GetCachedItem<ContestGame>("daily");
 
 
             if (dailyAnimes == null)
             {
+                  if (user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
+                {
+                    simpleResponse.Response = "You have already played this game";
+
+                    return BadRequest(simpleResponse);
+                }
                 Random rnd = new Random();
                 dailyAnimes = new ContestGame();
                 dailyAnimes.Anime = new List<AnimeWithEmoji>(_animleConect.AnimeWithEmoji.OrderBy((item) => rnd.Next()).Take(15));
@@ -91,7 +88,24 @@ namespace Animle.Controllers
                     dailyAnimes.Anime.Add(animeWithEmoji);
                 });
                 _cacheManager.SetCacheItem("daily", dailyAnimes, TimeSpan.FromDays(1));
+            } else
+            {
+
+                if (user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
+                {
+                    simpleResponse.Response = "You have already played this game";
+
+                    return BadRequest(simpleResponse);
+                }
+
+
             }
+
+
+
+
+
+
 
             var data = UtilityService.Serialize(dailyAnimes);
             var bytes = Encoding.UTF8.GetBytes(data);
@@ -100,7 +114,7 @@ namespace Animle.Controllers
 
         [HttpPost]
         [EnableRateLimiting("fixed")]
-        [Route("daily")]
+        [Route("contest")]
         public async Task<IActionResult> DailyResult([FromBody] DailyGameResult gameResult )
         {
             SimpleResponse simpleResponse = new();
@@ -131,13 +145,12 @@ namespace Animle.Controllers
             }
             ContestGame dailyAnimes = _cacheManager.GetCachedItem<ContestGame>("daily");
 
-
             if (!user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
             {
                 GameContest game = new GameContest();
                 game.gameGuid = new Guid(gameResult.GameId);
                 game.Points = gameResult.Result;
-                game.Type = dailyAnimes.Type;
+                game.Type = gameResult.Type;
                 game.TimePlayed = DateTime.Now;
                 game.User = user;
                 user.GameContests.Add(game);
@@ -148,6 +161,7 @@ namespace Animle.Controllers
 
                 return Ok(simpleResponse);
             }
+           
             simpleResponse.Response = "You have Already Played this game!";
 
             return BadRequest(simpleResponse.Response);
