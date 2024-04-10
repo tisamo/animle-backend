@@ -1,11 +1,10 @@
 ﻿using Quartz;
 using Animle.Models;
-using System.Text.Json;
-using System.Xml;
+using Animle.services.Cache;
 using Animle.interfaces;
-using System;
+using Animle.SignalR;
 
-namespace Animle.services
+namespace Animle.services.Quartz
 {
 
     public class MonthlyJob : IJob
@@ -92,21 +91,19 @@ namespace Animle.services
             Random rnd = new Random();
 
             var cachedAnime = cacheManager.GetCachedItem<List<AnimeWithEmoji>>("monthly");
-            var animes = cachedAnime.OrderBy(item => rnd.Next()).Take(15);
             List<AnimeWithEmoji> dailyAnimes = new List<AnimeWithEmoji>();
             ContestGame dailyGame = new();
             dailyGame.Type = "daily";
 
-            if (animes != null)
+            if (cachedAnime != null)
             {
-                dailyAnimes = new List<AnimeWithEmoji>(animes.OrderBy((item) => rnd.Next()).Take(15));
+                dailyAnimes = new List<AnimeWithEmoji>(cachedAnime.OrderBy((item) => rnd.Next()).Take(15));
                 dailyAnimes.ForEach((a) =>
 
                 {
                     int gameType = rnd.Next(0, 3);
-                    AnimeWithEmoji animeWithEmoji = a;
-                    animeWithEmoji.Type = UtilityService.GetTypeByNumber(gameType);
-                    dailyAnimes.Add(animeWithEmoji);
+                    a.Type = UtilityService.GetTypeByNumber(gameType);
+
                 });
             }
             else
@@ -116,9 +113,8 @@ namespace Animle.services
 
                 {
                     int gameType = rnd.Next(0, 3);
-                    AnimeWithEmoji animeWithEmoji = a;
-                    animeWithEmoji.Type = UtilityService.GetTypeByNumber(gameType);
-                    dailyAnimes.Add(animeWithEmoji);
+
+                    a.Type = UtilityService.GetTypeByNumber(gameType);
                 });
             }
             cacheManager.SetCacheItem("daily", dailyGame, TimeSpan.FromDays(1));
@@ -142,22 +138,19 @@ namespace Animle.services
         {
 
             var cachedAnime = cacheManager.GetCachedItem<List<AnimeWithEmoji>>("monthly");
-            var animes = new List<AnimeWithEmoji>(cachedAnime);
             Random rnd = new Random();
             List<AnimeWithEmoji> dailyAnimes = new List<AnimeWithEmoji>();
             ContestGame dailyGame = new();
             dailyGame.Type = "weekly";
 
-            if (animes != null)
+            if (cachedAnime != null)
             {
-                dailyAnimes = new List<AnimeWithEmoji>(animes.OrderBy((item) => rnd.Next()).Take(25));
+                dailyAnimes = new List<AnimeWithEmoji>(cachedAnime.OrderBy((item) => rnd.Next()).Take(25));
                 dailyAnimes.ForEach((a) =>
 
                 {
                     int gameType = rnd.Next(0, 3);
-                    AnimeWithEmoji animeWithEmoji = a;
-                    animeWithEmoji.Type = UtilityService.GetTypeByNumber(gameType);
-                    dailyAnimes.Add(animeWithEmoji);
+                    a.Type = UtilityService.GetTypeByNumber(gameType);
                 });
             }
             else
@@ -167,9 +160,7 @@ namespace Animle.services
 
                 {
                     int gameType = rnd.Next(0, 3);
-                    AnimeWithEmoji animeWithEmoji = a;
-                    animeWithEmoji.Type = UtilityService.GetTypeByNumber(gameType);
-                    dailyAnimes.Add(animeWithEmoji);
+                    a.Type = UtilityService.GetTypeByNumber(gameType);
                 });
             }
             cacheManager.SetCacheItem("weekly", dailyGame, TimeSpan.FromDays(7));

@@ -33,7 +33,6 @@ public static class EmailService
 
         using (var client = new SmtpClient())
         {
-            // For demo purposes, accept any SSL certificate (in production, use a proper SSL certificate)
             client.ServerCertificateValidationCallback = (s, c, h, e) => true;
 
             client.Connect("smtp.gmail.com", 587, false);

@@ -1,19 +1,14 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using NHibernate;
 using Animle.services;
-using System.Text.Json;
 using Animle.Models;
 using Microsoft.AspNetCore.RateLimiting;
-using NHibernate.Criterion;
 using System.Text;
-using Microsoft.IdentityModel.Tokens;
-using System;
-using MySqlX.XDevAPI;
-using NHibernate.Linq;
 using Animle.interfaces;
 using NHibernate.Util;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
+using Animle.services.Cache;
+using Animle.services.Token;
 
 namespace Animle.Controllers
 {
@@ -39,8 +34,6 @@ namespace Animle.Controllers
             _logger = logger;
             _animleConect = animleDbContext;
         }
-
-
 
         [HttpGet]
         [EnableRateLimiting("fixed")]
@@ -81,7 +74,7 @@ namespace Animle.Controllers
                 });
                 _cacheManager.SetCacheItem("daily", dailyAnimes, TimeSpan.FromDays(1));
             }
-                 else
+            else
             {
 
                 if (user.GameContests.Any(u => u.gameGuid == dailyAnimes.Id))
@@ -90,15 +83,7 @@ namespace Animle.Controllers
 
                     return BadRequest(simpleResponse);
                 }
-
-
             }
-
-
-
-
-
-
 
             var data = UtilityService.Serialize(dailyAnimes);
             var bytes = Encoding.UTF8.GetBytes(data);
@@ -170,6 +155,8 @@ namespace Animle.Controllers
         public async Task<IActionResult> SearchAnime([FromQuery] string q)
         {
             List<AnimeFilter> filteredList = _animleConect.AnimeWithEmoji.Where(x => x.JapaneseTitle.ToLower().Contains(q) || x.Title.ToLower().Contains(q))
+                .OrderBy(x => x.JapaneseTitle.Length)
+
                .Select(x => new AnimeFilter
                {
 
@@ -210,7 +197,7 @@ namespace Animle.Controllers
                       anim.ForEach((a) =>
                      {
                      int random = rnd.Next(0, anim.Count - 1);
-                     int gameType = rnd.Next(0, 3);
+                     int gameType = rnd.Next(0, 4);
                      a.Type = UtilityService.GetTypeByNumber(gameType);
                   });
 

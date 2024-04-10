@@ -3,7 +3,7 @@ using AspNetCoreRateLimit;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.AspNetCore.SignalR.Client;
 using System;
-
+using System.Net;
 
 var builder = WebApplication.CreateBuilder(args);
 

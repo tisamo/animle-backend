@@ -1,8 +1,7 @@
-﻿using Animle.services;
-using Quartz;
+﻿using Quartz;
 using System.Runtime.CompilerServices;
 
-namespace Animle.NewFolder
+namespace Animle.services.Quartz
 {
     public static class Quartz
     {
@@ -19,24 +18,21 @@ namespace Animle.NewFolder
                 {
                     trigger.ForJob(monthly).WithCronSchedule("* * 1 * * ?");
                 });
-
                 options.AddJob<MonthlyJob>(instant).AddTrigger(trigger =>
                 {
                     trigger.ForJob(instant).StartNow();
                 });
                 options.AddJob<DailyJob>(daily).AddTrigger(trigger =>
                 {
-                    trigger.ForJob(daily).WithCronSchedule("0 0 * * * ?");
+                    trigger.ForJob(daily).WithCronSchedule("0 1 * * * ?");
                 });
-
-
                 options.AddJob<WeeklyJob>(weekly).AddTrigger(trigger =>
                 {
-                    trigger.ForJob(weekly).WithCronSchedule("0 0 * * 1 ?");
+                    trigger.ForJob(weekly).WithCronSchedule("* * * * 1 ?");
                 });
             });
             services.AddQuartzHostedService();
         }
-    
+
     }
 }

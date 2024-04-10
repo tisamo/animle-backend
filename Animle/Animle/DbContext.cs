@@ -39,8 +39,6 @@ public class AnimleDbContext : DbContext
             .WithMany(c => c.Likes)
             .HasForeignKey(l => l.quizId);
 
-        modelBuilder.Entity<QuizLikes>()
-         .HasKey(l => new { l.UserId, l.quizId });
 
         modelBuilder.Entity<ThreebythreeLike>()
             .HasOne(l => l.User)

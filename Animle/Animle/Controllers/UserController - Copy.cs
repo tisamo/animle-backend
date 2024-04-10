@@ -1,4 +1,4 @@
-﻿sing Microsoft.AspNetCore.Mvc;
+﻿ing Microsoft.AspNetCore.Mvc;
 using NHibernate;
 
 using Animle;
@@ -82,8 +82,7 @@ namespace StoryTeller.Controllers
         {
             using (var session = _sessionFactory.OpenSession())
             using (var transaction = session.BeginTransaction())
-            {
-                var user = session.Query<User>().FirstOrDefault(u => u.Name == loginInfos.Name);
+            {                var user = session.Query<User>().FirstOrDefault(u => u.Name == loginInfos.Name);
                 if (user != null)
                 {   
                     PasswordManager passwordManager = new PasswordManager();

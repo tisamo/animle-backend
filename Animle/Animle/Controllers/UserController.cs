@@ -2,10 +2,10 @@
 using NHibernate;
 
 using Animle;
-using Animle.services;
 using Animle.interfaces;
 using Microsoft.AspNetCore.RateLimiting;
 using MySqlX.XDevAPI;
+using Animle.services.Token;
 
 namespace StoryTeller.Controllers
 {

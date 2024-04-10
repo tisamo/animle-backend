@@ -13,7 +13,11 @@ namespace Animle.services
 
             try
             {
-                client.DefaultRequestHeaders.Add("X-MAL-CLIENT-ID", "5ab79100e2772855f94a8372f5863c36");
+                var configuration = new ConfigurationBuilder()
+                 .AddJsonFile("appsettings.json")
+                    .Build();
+
+                client.DefaultRequestHeaders.Add("X-MAL-CLIENT-ID", configuration.GetSection("MalId").Value);
 
                 HttpResponseMessage response = await client.GetAsync(apiUrl);
 
@@ -36,7 +40,6 @@ namespace Animle.services
             }
             finally
             {
-                // Dispose the HttpClient instance to free up resources
                 client.Dispose();
             }
         }

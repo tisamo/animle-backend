@@ -3,6 +3,7 @@ using Animle.interfaces;
 using Animle.Migrations;
 using Animle.Models;
 using Animle.services;
+using Animle.services.Token;
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -215,13 +216,11 @@ namespace Animle.Controllers
 
 
 
-        // PUT api/<QuziControoler>/5
         [HttpPut("{id}")]
         public void Put(int id, [FromBody] string value)
         {
         }
 
-        // DELETE api/<QuziControoler>/5
         [HttpDelete("{id}")]
         public void Delete(int id)
         {

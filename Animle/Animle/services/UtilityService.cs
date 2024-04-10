@@ -1,10 +1,6 @@
 ﻿using Animle.interfaces;
-using NHibernate;
-using NHibernate.Util;
-using System.Linq;
 using System.Reflection;
 using System.Text.Json;
-using System.Xml.Linq;
 
 namespace Animle.services
 {
@@ -22,9 +18,9 @@ namespace Animle.services
                 case 2:
                     return "image";
                 case 3:
-                    return "properties";
-                case 4:
                     return "shuffled";
+                case 4:
+                    return "properties";
                 default:
                     return "description";
             }

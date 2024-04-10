@@ -1,4 +1,4 @@
-﻿namespace Animle.services
+﻿namespace Animle.services.Token
 {
     using System;
     using System.IdentityModel.Tokens.Jwt;
@@ -19,7 +19,7 @@
             _securityKey = new SymmetricSecurityKey(Convert.FromBase64String(_secretKey));
         }
 
-        public String CreateToken(User user)
+        public string CreateToken(User user)
         {
 
             var claims = new List<Claim>();
@@ -65,7 +65,7 @@
             {
                 return null;
             }
-        
+
         }
 
         public bool GetUserRolesAndValidate(ClaimsPrincipal claimsPrincipal, string RoleRequired)
@@ -87,7 +87,7 @@
 
 
 
-            return animDbContext.Users.FirstOrDefault(u => (u.Id.ToString() == userIdClaim.Value) || (u.Name == userIdClaim.Value));
+            return animDbContext.Users.FirstOrDefault(u => u.Id.ToString() == userIdClaim.Value || u.Name == userIdClaim.Value);
 
 
         }
