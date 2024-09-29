@@ -5,6 +5,7 @@ using Animle.Models;
 using Animle.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using NHibernate.Util;
 
 namespace Animle.Controllers;
 
@@ -93,7 +94,12 @@ public class QuziController : ControllerBase
     {
         var quiz = await _quizService.GetQuizByIdAsync(id);
         var rnd = new Random();
-        quiz.Animes.ForEach(a => a.Type = UtilityService.GetTypeByNumber(rnd.Next(0, 3)));
+        for(var i = 0; i < quiz.Animes.Count; i++)
+        {
+            quiz.Animes.ElementAt(i).Type = UtilityService.GetTypeByNumber(rnd.Next(0, 4));
+
+        }
+
         return Ok(quiz);
     }
 
