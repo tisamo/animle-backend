@@ -8,7 +8,7 @@ using Quartz;
 
 namespace Animle.Services.Quartz
 {
-    public class MonthlyJob : IJob
+    public class InitialJob : IJob
     {
         private IRequestCacheManager cacheManager;
 
@@ -17,7 +17,7 @@ namespace Animle.Services.Quartz
 
         private SignalrAnimeService _signalrAnimeService;
 
-        public MonthlyJob(IRequestCacheManager requestCacheManager, AnimleDbContext animle,
+        public InitialJob(IRequestCacheManager requestCacheManager, AnimleDbContext animle,
             SignalrAnimeService signalrAnimeService)
         {
             cacheManager = requestCacheManager;
@@ -33,7 +33,7 @@ namespace Animle.Services.Quartz
 
             List<AnimeWithEmoji> animes = _animle.AnimeWithEmoji.Take(453).ToList();
 
-            cacheManager.SetCacheItem("monthly", animes, TimeSpan.FromDays(31));
+            cacheManager.SetCacheItem("monthly", animes, TimeSpan.MaxValue);
 
             _signalrAnimeService.SetList(animes);
 

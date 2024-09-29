@@ -13,11 +13,8 @@ namespace Animle.Services.Quartz
                 var weekly = JobKey.Create("Weekly");
                 var instant = JobKey.Create("Instant");
                 options.UseMicrosoftDependencyInjectionJobFactory();
-                options.AddJob<MonthlyJob>(monthly).AddTrigger(trigger =>
-                {
-                    trigger.ForJob(monthly).WithCronSchedule("* * 1 * * ?");
-                });
-                options.AddJob<MonthlyJob>(instant).AddTrigger(trigger => { trigger.ForJob(instant).StartNow(); });
+     
+                options.AddJob<InitialJob>(instant).AddTrigger(trigger => { trigger.ForJob(instant).StartNow(); });
                 options.AddJob<DailyJob>(daily).AddTrigger(trigger =>
                 {
                     trigger.ForJob(daily).WithCronSchedule("0 1 * * * ?");

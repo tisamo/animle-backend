@@ -46,14 +46,14 @@ namespace Animle
 
 
             builder.Services.AddSignalR();
-            builder.Services.AddScoped<CustomAuthorizationFilter>();
             builder.Services.AddSingleton<EncryptionHelper>();
             builder.Services.AddControllers().AddJsonOptions(x =>
                 x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
             builder.Services.AddSingleton<SignalrAnimeService>();
             builder.Services.AddSingleton<IRequestCacheManager, RequestCacheManager>();
             builder.Services.AddSingleton<EmailService>();
-
+            
+            builder.Services.AddScoped<CustomAuthorizationFilter>();
             builder.Services.AddScoped<IAnimeService, AnimeService>();
             builder.Services.AddScoped<IQuizService, QuizService>();
             builder.Services.AddScoped<IUserService, UserService>();
