@@ -34,9 +34,7 @@ namespace Animle.Helpers
                     return responseBody;
                 }
                 else
-                {
-                    Console.WriteLine("Mi a tő");
-                    ;
+                {                    
 
                     return null;
                 }

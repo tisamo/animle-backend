@@ -81,7 +81,6 @@ namespace Animle.Services.Quartz
                         .Where(anime => !dailyAnime.Contains(anime))
                         .OrderBy(item => rnd.Next())
                         .ToList();
-                    Console.WriteLine(filteredAnimes.Count);
                     var animeWithEmoji = filteredAnimes.OrderBy((item) => rnd.Next()).Take(1).ElementAt(0);
                     guessGame.Anime = animeWithEmoji;
                     guessGame.AnimeWithEmojiId = animeWithEmoji.Id;
@@ -131,7 +130,6 @@ namespace Animle.Services.Quartz
                     new List<AnimeWithEmoji>(_animle.AnimeWithEmoji.Take(453).OrderBy((item) => rnd.Next()).Take(15));
             }
 
-            Console.WriteLine("miatő");
 
             var todaysQuiz = _animle.DailyChallenges.FirstOrDefault(d => d.TimeCreated == DateTime.Now.Date);
             if (todaysQuiz == null)
@@ -155,7 +153,6 @@ namespace Animle.Services.Quartz
                 todaysQuiz.Animes.ElementAt(i).Type = UtilityService.GetTypeByNumber(gameType);
             }
 
-            Console.WriteLine("miatő");
             cacheManager.SetCacheItem("daily", todaysQuiz, TimeSpan.FromDays(1));
 
             try
