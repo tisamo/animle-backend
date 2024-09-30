@@ -30,7 +30,6 @@ namespace Animle.Helpers
                 if (response.IsSuccessStatusCode)
                 {
                     var responseBody = await response.Content.ReadAsStringAsync();
-                    Console.WriteLine(responseBody);
                     return responseBody;
                 }
                 else
