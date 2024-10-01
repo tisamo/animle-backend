@@ -35,19 +35,6 @@ namespace Animle.Controllers
             return Ok(simpleResponse);
         }
 
-        private class ApiResult
-        {
-            public bool IsSuccess { get; set; }
-            public string? Message { get; set; }
-            
-            private ApiResult(bool success, string? message = null)
-            {
-                IsSuccess = success;
-                Message = message;
-            }
-            
-            public static ApiResult Ok(string? message = null) => new(true, message);
-            public static ApiResult Error(string? message = null) => new(false, message);
-        }
+     
     }
 }

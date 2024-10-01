@@ -30,10 +30,11 @@ namespace Animle.Services.Quartz
         {
             var rnd = new Random();
 
+      
 
             List<AnimeWithEmoji> animes = _animle.AnimeWithEmoji.Take(453).ToList();
 
-            cacheManager.SetCacheItem("monthly", animes, TimeSpan.MaxValue);
+            cacheManager.SetCacheItem("monthly", animes, TimeSpan.FromDays(30));
 
             _signalrAnimeService.SetList(animes);
 
