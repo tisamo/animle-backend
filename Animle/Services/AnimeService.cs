@@ -127,10 +127,9 @@ namespace Animle.Services
                 return null;
             }
 
-            var resObject = new { Id = guessGame.Id, AnimeId = guessGame.Anime.Id, guessGame.Anime.EmojiDescription };
 
+            return new { Id = guessGame.Id, AnimeId = guessGame.Anime.Id, guessGame.Anime.EmojiDescription };
 
-            return resObject;
         }
     }
 }
