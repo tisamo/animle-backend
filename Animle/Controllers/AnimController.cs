@@ -1,11 +1,10 @@
 ﻿using Animle.Actions;
 using Animle.Classes;
-using Animle.Interfaces;
 using Animle.Models;
 using Animle.Services;
-using Animle.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using MySqlX.XDevAPI.Common;
 
 namespace Animle.Controllers
 {
@@ -14,43 +13,80 @@ namespace Animle.Controllers
     public class AnimController : ControllerBase
     {
         private readonly IAnimeService _animeService;
+        private readonly EncryptionHelper _encryptionHelper;
 
-        public AnimController(IAnimeService animeService)
+        public AnimController(IAnimeService animeService, EncryptionHelper encryptionHelper)
         {
             _animeService = animeService;
+            _encryptionHelper = encryptionHelper;
         }
 
         [HttpGet]
-        [ServiceFilter(typeof(CustomAuthorizationFilter))]
+        [ServiceFilter(typeof(DailyGameAction))]
         [EnableRateLimiting("fixed")]
-        [Route("daily")]
-        public async Task<IActionResult> Daily()
+        [Route("daily/{fingerprint}")]
+        public async Task<IActionResult> Daily(string fingerprint)
         {
-            if (HttpContext.Items["user"] is User user)
-            {
-                var result = await _animeService.GetDailyChallengeAsync(user);
-                return result != null
-                    ? Ok(result)
-                    : BadRequest(new { Response = "You have already played this game." });
-            }
+               var user = HttpContext.Items["user"] as User;
+           
+             var  result = await _animeService.GetDailyChallengeAsync(user, fingerprint);
+            
+         
+            return result != null ? Ok(result) : BadRequest(new { Response = "You have already played this game."});
 
-            return Unauthorized();
         }
 
         [HttpPost]
         [EnableRateLimiting("fixed")]
-        [ServiceFilter(typeof(CustomAuthorizationFilter))]
+        [ServiceFilter(typeof(DailyGameAction))]
         [Route("contest/{type}")]
         public async Task<IActionResult> DailyResult(string type, DailyGameResult gameResult)
         {
-            if (HttpContext.Items["user"] is User user)
+            User? currentUser = HttpContext.Items["user"] as User;
+
+            dynamic result;
+
+            if(currentUser != null)
             {
-                var result = await _animeService.SubmitGameResultAsync(type, user, gameResult);
-                return result.IsSuccess ? Ok(result) : BadRequest(result.Response);
+                 result = await _animeService.SubmitGameResultAsync(type, currentUser, gameResult);
+
+            }
+            else
+            {
+                result = await _animeService.SubmitGameResultAnonymously(type, gameResult);
+
             }
 
-            return NotFound(new { Response = "User not found" });
+            return result.IsSuccess ? Ok(result) : BadRequest(result.Response);
+            
+
         }
+
+        [HttpPost]
+        [EnableRateLimiting("fixed")]
+        [ServiceFilter(typeof(DailyGameAction))]
+        [Route("guess/progress")]
+        public async Task<IActionResult> GuessGameProgress(GuessGameProgress gameResult)
+        {
+            User? currentUser = HttpContext.Items["user"] as User;
+
+            dynamic result;
+
+            if (currentUser!= null)
+            {
+                result = await _animeService.SubmitLoggedInUserProgress(currentUser, gameResult);
+            }
+            else
+            {
+                result = await _animeService.SubmitUnAuthenticatedUserProgress(gameResult);
+            }
+
+
+                return result.IsSuccess ? Ok(result) : BadRequest(result.Response);
+            
+        }
+
+
 
         [HttpGet]
         [EnableRateLimiting("fixed")]
@@ -72,17 +108,26 @@ namespace Animle.Controllers
 
         [HttpGet]
         [EnableRateLimiting("fixed")]
-        [ServiceFilter(typeof(CustomAuthorizationFilter))]
-        [Route("emoji-quiz")]
-        public IActionResult EmojiQuiz()
+        [ServiceFilter(typeof(DailyGameAction))]
+        [Route("emoji-quiz/{fingerPrint}")]
+        public IActionResult EmojiQuiz(string fingerPrint)
         {
-            if (HttpContext.Items["user"] is User user)
+            dynamic quiz;
+
+            string encodedFingerprint = Uri.EscapeDataString(fingerPrint);
+            if ( HttpContext.Items["user"] is User user)
             {
-                var quiz = _animeService.GetEmojiQuiz(user);
-                return quiz != null ? Ok(quiz) : BadRequest(new { Response = "You have already played this game." });
+                 quiz = _animeService.GetEmojiQuiz(user, fingerPrint);
+            }
+            else
+            {
+                quiz = _animeService.GetEmojiQuizUnAuthenticated(fingerPrint);
             }
 
-            return Unauthorized();
+
+                return quiz != null ? Ok(new { Response = _encryptionHelper.Encrypt(quiz) }) : BadRequest(new { Response = "You have already played this game." });
+            
+
         }
     }
 }

@@ -68,7 +68,7 @@ public class AnimleDbContext : DbContext
             .HasOne(gc => gc.Challenge)
             .WithMany(dc => dc.GameContests)
             .HasForeignKey(gc => gc.DailyChallengeId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.SetNull);
 
         modelBuilder.Entity<Versus>()
             .HasOne(t => t.User)
@@ -89,7 +89,7 @@ public class AnimleDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .HasMany(a => a.UserGuessGames)
-            .WithOne(g => g.user)
+            .WithOne(g => g.User)
             .HasForeignKey(g => g.UserId)
             .OnDelete(DeleteBehavior.Cascade);
     }

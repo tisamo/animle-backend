@@ -3,6 +3,7 @@ using System;
 using Animle;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Animle.Migrations
 {
     [DbContext(typeof(AnimleDbContext))]
-    partial class AnimleDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241010093218_fingerprints")]
+    partial class fingerprints
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -130,9 +133,6 @@ namespace Animle.Migrations
 
                     b.Property<int>("DailyChallengeId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Fingerprint")
-                        .HasColumnType("longtext");
 
                     b.Property<int>("Result")
                         .HasColumnType("int");
@@ -319,16 +319,13 @@ namespace Animle.Migrations
                     b.Property<DateTime>("Created")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<string>("Fingerprint")
-                        .HasColumnType("longtext");
-
                     b.Property<int>("GuessGameId")
                         .HasColumnType("int");
 
                     b.Property<int>("Result")
                         .HasColumnType("int");
 
-                    b.Property<int?>("UserId")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
@@ -505,14 +502,15 @@ namespace Animle.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Animle.Models.User", "User")
+                    b.HasOne("Animle.Models.User", "user")
                         .WithMany("UserGuessGames")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade);
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("GuessGame");
 
-                    b.Navigation("User");
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("Animle.Models.Versus", b =>

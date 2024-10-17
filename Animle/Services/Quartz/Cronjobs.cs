@@ -71,7 +71,7 @@ namespace Animle.Services.Quartz
             cacheManager.SetCacheItem("daily", todaysQuiz, TimeSpan.FromDays(1));
 
 
-            var todaysGuess = _animle.GuessGames.FirstOrDefault(d => d.TimeCreated == DateTime.Now.Date);
+            var todaysGuess = _animle.GuessGames.Include(x=> x.Anime).FirstOrDefault(d => d.TimeCreated == DateTime.Now.Date);
 
             if (todaysGuess == null)
             {

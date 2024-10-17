@@ -45,6 +45,30 @@ public class QuziController : ControllerBase
 
     [EnableRateLimiting("fixed")]
     [ServiceFilter(typeof(CustomAuthorizationFilter))]
+    [HttpPut]
+    public async Task<IActionResult> EditQuiz([FromBody] QuizCreation quiz)
+    {
+        if (HttpContext.Items["user"] is User user)
+        {
+            try
+            {
+                var response = await _quizService.EditQuiZAsync(quiz, user);
+                return response.IsSuccess ? Ok(new SimpleResponse { Response = response.Response }): BadRequest(response.Response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+        else
+        {
+            return Unauthorized(new { Response = "Please login first!" });
+        }
+    }
+
+
+    [EnableRateLimiting("fixed")]
+    [ServiceFilter(typeof(CustomAuthorizationFilter))]
     [Route("like/{id}")]
     [HttpGet]
     public async Task<IActionResult> LikeQuiz(int id)
@@ -66,7 +90,7 @@ public class QuziController : ControllerBase
     }
 
     [HttpGet]
-    [ServiceFilter(typeof(CustomAuthorizationFilter))]
+    [ServiceFilter(typeof(DailyGameAction))]
     [Route("likes")]
     public async Task<IActionResult> RetrieveUserLikes()
     {
@@ -84,7 +108,8 @@ public class QuziController : ControllerBase
         }
         else
         {
-            return Unauthorized(new { Response = "You must be logged in" });
+            dynamic[] array = [];
+            return Ok(array);
         }
     }
 
@@ -102,6 +127,32 @@ public class QuziController : ControllerBase
 
         return Ok(quiz);
     }
+
+    [EnableRateLimiting("fixed")]
+    [ServiceFilter(typeof(CustomAuthorizationFilter))]
+    [HttpGet("edit/{id}")]
+    public async Task<IActionResult> GetUserQuiz(int id)
+    {
+       if (HttpContext.Items["user"] is User user)
+        {
+            try
+            {
+                var response = await _quizService.GetUserQuizForEditing(id, user);
+                if (response == null)
+                {
+                    return BadRequest(new {Response  = "You can't edit this quiz"});
+                }    
+                return Ok(response);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
+        }
+
+        return Unauthorized(new { Response = "You must be logged in" });
+    }
+    
 
     [EnableRateLimiting("fixed")]
     [HttpGet]

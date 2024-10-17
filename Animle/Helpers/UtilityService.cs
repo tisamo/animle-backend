@@ -60,8 +60,7 @@ namespace Animle.Helpers
                             }
                         }
 
-                        break;
-
+                        break;   
                     case "limit":
                         if (int.TryParse(q.Value.ElementAt(0), out var parsedLimit))
                         {

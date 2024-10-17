@@ -4,6 +4,7 @@ using Animle.Models;
 using Animle.Services;
 using Animle.Services.Auth;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace Animle.Controllers;
 
@@ -47,10 +48,12 @@ public class UserController : ControllerBase
     [HttpPost]
     public async Task<IActionResult> Login(LoginInfos loginInfos)
     {
+
         var user = await _userService.AuthenticateUserAsync(loginInfos);
         if (user != null)
         {
-            var tokenResponse = new TokenResponse { Token = _tokenService.CreateToken(user) };
+            var tokenResponse = new TokenResponse { Token = _tokenService.CreateToken(user)};
+            await _userService.FindUnauthenticatedDailyGamesAndPairItToTheUser(user, loginInfos.Fingerprint);
             return Ok(tokenResponse);
         }
 
@@ -65,7 +68,7 @@ public class UserController : ControllerBase
     {
         if (HttpContext.Items["user"] is User user)
         {
-            return Ok(new { Response = user.Name });
+            return Ok(new { Response = $"{user.Name}_{user.Id}" });
         }
 
         return Unauthorized();

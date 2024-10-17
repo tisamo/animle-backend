@@ -8,8 +8,9 @@ namespace Animle.Models
 
         public DateTime TimePlayed { get; set; } = DateTime.Now;
 
+        public string? Fingerprint { get; set; }
 
-        public int UserId { get; set; }
+        public int? UserId { get; set; }
 
         public int Result { get; set; }
 
@@ -18,6 +19,6 @@ namespace Animle.Models
         [ForeignKey("DailyChallengeId")] public virtual DailyChallenge Challenge { get; set; }
 
 
-        public virtual User User { get; set; }
+        public virtual User? User { get; set; }
     }
 }

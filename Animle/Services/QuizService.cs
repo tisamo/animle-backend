@@ -1,7 +1,10 @@
-﻿using System.Reflection;
+﻿using System;
+using System.Reflection;
+using System.Web;
 using Animle.Classes;
 using Animle.Helpers;
 using Animle.Models;
+using FluentNHibernate.Conventions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Animle.Services;
@@ -9,6 +12,8 @@ namespace Animle.Services;
 public class QuizDto
 {
     public int Id { get; set; }
+
+    public List< QuizLikes>? Likes { get; set; }
     public string Title { get; set; }
     public DateTime CreatedAt { get; set; }
 
@@ -20,9 +25,11 @@ public class QuizDto
 public interface IQuizService
 {
     Task<Quiz> CreateQuizAsync(QuizCreation quiz, User user);
+    Task<SimpleResponse> EditQuiZAsync(QuizCreation quiz, User user);
     Task<string> LikeQuizAsync(int id, User user);
     Task<List<int>> RetrieveUserLikesAsync(User user);
     Task<Quiz> GetQuizByIdAsync(int id);
+    Task<dynamic> GetUserQuizForEditing(int id, User user);
     Task<ListResponse<QuizDto>> GetQuizzesAsync(IQueryCollection queryString);
 }
 
@@ -52,6 +59,34 @@ public class QuizService : IQuizService
         _context.Quizes.Add(newQuiz);
         await _context.SaveChangesAsync();
         return newQuiz;
+    }
+
+
+    public async Task<SimpleResponse> EditQuiZAsync(QuizCreation quiz, User user)
+    {
+        var quizToEdit = _context.Quizes
+         .Include(q => q.Animes)
+         .Include(q => q.user) 
+         .FirstOrDefault(q => q.Id == quiz.Id && q.user.Id == user.Id);
+
+        if (quizToEdit == null)
+        {
+            return new SimpleResponse { IsSuccess = false, Response = "You can't edit this quiz" };
+        }
+
+        quizToEdit.Title = quiz.Title;
+
+        quizToEdit.Animes = _context.AnimeWithEmoji
+            .Where(p => quiz.AnimeIds.Contains(p.MyanimeListId))
+            .ToList();
+
+        quizToEdit.Thumbnail = _context.AnimeWithEmoji
+            .FirstOrDefault(a => a.MyanimeListId == quiz.SelectedImageId)?.Thumbnail;
+
+        _context.Quizes.Update(quizToEdit);
+        await _context.SaveChangesAsync();
+
+        return new SimpleResponse { IsSuccess = true, Response = "Quiz successfully edited" };
     }
 
     public async Task<string> LikeQuizAsync(int id, User user)
@@ -90,21 +125,60 @@ public class QuizService : IQuizService
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
+
+
+    public async Task<dynamic> GetUserQuizForEditing(int id, User user)
+    {
+        var quiz = await _context.Quizes
+            .Include(x => x.Animes)
+                .Select(x=>
+               new{
+                 Animes = x.Animes,
+                 Id = x.Id,
+                 UserId = x.UserId,
+                 Title = x.Title,
+                 CreatedAt = x.CreatedAt,
+                 Thumbnail = x.Thumbnail
+                })
+            .FirstOrDefaultAsync(x => x.Id == id && x.UserId == user.Id);
+        return quiz;   
+    }
+
+
     public async Task<ListResponse<QuizDto>> GetQuizzesAsync(IQueryCollection queryString)
     {
-        
+            queryString.TryGetValue("user", out var userValue);
+            queryString.TryGetValue("top", out var onlyTop);
+
+
+
         var query = UtilityService.GenerateQuery(queryString,
-            _context.Quizes.Include(x => x.user).Select(x => new QuizDto
+            _context.Quizes.Include(x => x.user).Include(x=> x.Likes).Select(x => new QuizDto
             {
                 Thumbnail = x.Thumbnail,
                 Title = x.Title,
                 CreatedAt = x.CreatedAt,
                 Id = x.Id,
+                Likes = (List<QuizLikes>)x.Likes,
                 user = new UserDto
                 {
-                    Name = x.user.Name
+                    Name = x.user.Name,
+                    Id = x.user.Id
                 }
             }).ToList());
+
+        if (!onlyTop.IsEmpty()) {
+            query.List = query.List.OrderByDescending(x => x.Likes.Count).ToList();
+        }
+
+        if (!userValue.IsEmpty())
+        {
+   
+            query.List = query.List.Where(x => x.user.Id.ToString() ==userValue).ToList();
+        }
+
+
+
 
         return query;
     }

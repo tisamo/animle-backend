@@ -1,37 +1,46 @@
-﻿using System.Security.Cryptography;
-using System.Text;
-using Animle.Classes;
+﻿using Animle.Classes;
 using Microsoft.Extensions.Options;
-
-namespace Animle.Helpers;
+using Newtonsoft.Json;
+using System;
+using System.IO;
+using System.Security.Cryptography;
+using System.Text;
 
 public class EncryptionHelper
 {
+    private readonly byte[] key;
+    private readonly byte[] iv; 
+
     private readonly ConfigSettings _appSettings;
 
     public EncryptionHelper(IOptions<ConfigSettings> options)
     {
         _appSettings = options.Value;
+        key = Convert.FromBase64String(_appSettings.Aes); 
+        iv = Encoding.UTF8.GetBytes(_appSettings.AesIV);
     }
 
-    public byte[] Encrypt(byte[] plainBytes)
+    public string Encrypt(dynamic obj)
     {
-        var secret = _appSettings.HashingSercret;
-        var key = Encoding.UTF8.GetBytes(secret);
-        byte[] encryptedBytes;
-
-        using (var aes = Aes.Create())
+        var plainText = JsonConvert.SerializeObject(obj);
+        using (Aes aesAlg = Aes.Create())
         {
-            aes.Key = key;
-            aes.Mode = CipherMode.ECB;
-            aes.Padding = PaddingMode.PKCS7;
+            aesAlg.Key = key;
+            aesAlg.IV = iv;
 
-            using (var encryptor = aes.CreateEncryptor())
+            ICryptoTransform encryptor = aesAlg.CreateEncryptor(aesAlg.Key, aesAlg.IV);
+
+            using (MemoryStream msEncrypt = new MemoryStream())
             {
-                encryptedBytes = encryptor.TransformFinalBlock(plainBytes, 0, plainBytes.Length);
+                using (CryptoStream csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                using (StreamWriter swEncrypt = new StreamWriter(csEncrypt))
+                {
+                    swEncrypt.Write(plainText);
+                }
+
+                byte[] encrypted = msEncrypt.ToArray();
+                return Convert.ToBase64String(encrypted);
             }
         }
-
-        return encryptedBytes;
     }
 }

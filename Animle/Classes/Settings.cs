@@ -7,6 +7,10 @@
 
         public string Email { get; set; }
 
+        public string Aes { get; set; }
+
+        public string AesIV { get; set; }
+
         public string EmailPassword { get; set; }
 
         public string HashingSercret { get; set; }

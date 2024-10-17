@@ -10,6 +10,7 @@ public interface IUserService
     Task<User> CreateUserAsync(User user);
     Task<User?> AuthenticateUserAsync(LoginInfos loginInfos);
     Task<User?> GetUserByIdAsync(int userId);
+    Task FindUnauthenticatedDailyGamesAndPairItToTheUser(User user, string fingerprint);
     Task<List<GameContest>> GetDailyLeaderBoardAsync(string type);
 }
 
@@ -40,6 +41,35 @@ public class UserService : IUserService
         }
 
         return null;
+    }
+
+    public async Task FindUnauthenticatedDailyGamesAndPairItToTheUser(User user, string fingerprint)
+    {
+        var anonymousDailyGames = await _context.GameContests
+        .Where(gc => gc.Fingerprint == fingerprint && (gc.UserId == null || gc.UserId == 0)) 
+        .ToListAsync();
+
+        var anonymousGuessGames = await _context.UserGuessGames
+        .Where(gc => gc.Fingerprint == fingerprint && (gc.UserId == null || gc.UserId == 0))
+        .ToListAsync();
+
+
+        anonymousDailyGames.ForEach((ad) =>
+        {
+            ad.User = user;
+            ad.UserId = user.Id;
+        });
+
+        anonymousGuessGames.ForEach((ag) =>
+        {
+            ag.User = user;
+            ag.UserId = user.Id;
+        });
+
+
+        await _context.SaveChangesAsync();
+
+
     }
 
     public async Task<User?> GetUserByIdAsync(int userId)

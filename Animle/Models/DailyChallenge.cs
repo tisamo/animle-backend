@@ -8,6 +8,7 @@
 
         public string Type { get; set; }
 
+
         public virtual ICollection<GameContest> GameContests { get; set; } = new List<GameContest>();
 
         public virtual ICollection<AnimeWithEmoji> Animes { get; set; } = new List<AnimeWithEmoji>();

@@ -54,6 +54,9 @@ namespace Animle
             builder.Services.AddSingleton<EmailService>();
             
             builder.Services.AddScoped<CustomAuthorizationFilter>();
+            builder.Services.AddScoped<DailyGameAction>();
+
+
             builder.Services.AddScoped<IAnimeService, AnimeService>();
             builder.Services.AddScoped<IQuizService, QuizService>();
             builder.Services.AddScoped<IUserService, UserService>();
