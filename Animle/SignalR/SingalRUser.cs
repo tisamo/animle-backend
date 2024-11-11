@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Animle.Classes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Animle.SignalR
 {
@@ -11,12 +12,22 @@ namespace Animle.SignalR
 
         public int Rating { get; set; }
 
-        public int? Result { get; set; } = null;
+        public DateTime WaitingSince = new();
+
+        public int? Result { get; set; } = 0;
+
+        public List < AnimeFilter> animes { get; set; } = new List< AnimeFilter>();
 
         public bool PlayerWaitingForMatch { get; set; } = false;
         public Player opponent { get; set; } = null;
         public bool IsPlaying { get; set; } = false;
 
         public int? QuizId { get; set; } = null;
+
+       public RestartableInterval MatchInterval { get; set; }
+
+        public RestartableInterval TickInterval { get; set; }
+
+
     }
 }

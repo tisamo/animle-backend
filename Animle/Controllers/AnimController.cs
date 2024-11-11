@@ -125,7 +125,7 @@ namespace Animle.Controllers
             }
 
 
-                return quiz != null ? Ok(new { Response = _encryptionHelper.Encrypt(quiz) }) : BadRequest(new { Response = "You have already played this game." });
+                return (quiz != null && quiz.Attempts < 5) ? Ok(new { Response = _encryptionHelper.Encrypt(quiz) }) : BadRequest(new { Response = "You have already played this game." });
             
 
         }

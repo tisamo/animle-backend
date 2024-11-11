@@ -97,7 +97,7 @@ namespace Animle.Services
                     GuessGame = userGame,
                     GuessGameId = userGame.Id
                 };
-            _dbContext.UserGuessGames.Add(guessGame);
+            _dbContext.UserGuessGames.Attach(guessGame);
             await _dbContext.SaveChangesAsync();
                 return new SimpleResponse { IsSuccess = true, Response = "Game saved" };
             
@@ -140,7 +140,7 @@ namespace Animle.Services
                 GuessGame = userGame,
                 GuessGameId = userGame.Id
             };
-            _dbContext.UserGuessGames.Add(guessGame);
+            _dbContext.UserGuessGames.Attach(guessGame);
             await _dbContext.SaveChangesAsync();
             return new SimpleResponse { IsSuccess = true, Response = "Game saved" };
 
@@ -269,7 +269,7 @@ namespace Animle.Services
                 return null;
             }
 
-            var userGuessGame = _dbContext.UserGuessGames.FirstOrDefault(g => g.GuessGameId == guessGame.Id && g.UserId == user.Id);
+            var userGuessGame = _dbContext.UserGuessGames.FirstOrDefault(g => g.GuessGameId == guessGame.Id && (g.UserId == user.Id || fingerPrint == g.Fingerprint));
 
             if (userGuessGame != null && (userGuessGame.Attempts >= 5 || userGuessGame.Result > 0))
             {
@@ -278,7 +278,7 @@ namespace Animle.Services
 
             int Attempts = userGuessGame?.Attempts ?? 0;
 
-            return new { Id = guessGame.Id, AnimeId = guessGame.Anime.Id, guessGame.Anime.EmojiDescription, Attemps = Attempts };
+            return new { Id = guessGame.Id, AnimeId = guessGame.Anime.Id, guessGame.Anime.EmojiDescription, Attempts = Attempts };
 
         }
 

@@ -52,7 +52,8 @@ namespace Animle
             builder.Services.AddSingleton<SignalrAnimeService>();
             builder.Services.AddSingleton<IRequestCacheManager, RequestCacheManager>();
             builder.Services.AddSingleton<EmailService>();
-            
+            builder.Services.AddScoped<NotificationService>();
+
             builder.Services.AddScoped<CustomAuthorizationFilter>();
             builder.Services.AddScoped<DailyGameAction>();
 

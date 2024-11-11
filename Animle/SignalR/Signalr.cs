@@ -13,9 +13,15 @@ public class SignarlRHub : Hub
     private readonly AnimleDbContext _context;
     public static List<Player> users = new List<Player>();
     private readonly SignalrAnimeService _signalrAnimeService;
+    private int selectedAnime = 0;
+    private RestartableInterval _restartableInterval;
+    private RestartableInterval _tickerInterval;
+    private readonly NotificationService _notificationService;
 
-    public SignarlRHub(AnimleDbContext context, TokenService tokenService, SignalrAnimeService signalrAnimeService)
+
+    public SignarlRHub(AnimleDbContext context, TokenService tokenService, SignalrAnimeService signalrAnimeService, NotificationService notificationService )
     {
+        _notificationService = notificationService;
         _context = context;
         _tokenService = tokenService;
         _signalrAnimeService = signalrAnimeService;
@@ -36,11 +42,14 @@ public class SignarlRHub : Hub
 
         if (user.opponent != null)
         {
-            await Clients.Client(user.opponent.ConnectionId).SendAsync("opponentDisconnected");
         }
 
 
         users.Remove(user);
+        if (user.MatchInterval != null)
+        {
+            user.MatchInterval.Dispose();
+        }
         await _context.SaveChangesAsync();
 
         await base.OnDisconnectedAsync(exception);
@@ -78,12 +87,12 @@ public class SignarlRHub : Hub
         {
             await Clients.Client(Context.ConnectionId).SendAsync("opponentNotFound", "opponent not found");
             return;
-        }
+        };
 
-        ;
-
-        var opponent = users.Where(u => u.PlayerWaitingForMatch && u.ConnectionId != Context.ConnectionId)
-            .OrderBy((x => new Guid())).FirstOrDefault();
+        var opponent = users
+        .Where(u => u.PlayerWaitingForMatch && u.ConnectionId != Context.ConnectionId)
+        .OrderBy(u => u.WaitingSince) 
+        .FirstOrDefault();
 
         if (opponent == null)
         {
@@ -105,39 +114,66 @@ public class SignarlRHub : Hub
             properties = x.properties,
             EmojiDescription = x.EmojiDescription,
             MyanimeListId = x.MyanimeListId,
-        }).Take(10).ToList();
+        }).Take(3).ToList();
 
         var rnd = new Random();
         anim.ForEach((a) =>
         {
-            var random = rnd.Next(0, anim.Count - 1);
-            var gameType = rnd.Next(0, 3);
-            a.Description = a.Description;
+            var gameType = rnd.Next(0, 4);
             a.Type = UtilityService.GetTypeByNumber(gameType);
         });
+        user.animes = anim;
+        var counter = 0;
+        _tickerInterval = new RestartableInterval(async () => {
+            counter++;
+            await _notificationService.SendMessageToTheUser(user.ConnectionId, "tick", counter);
+            await _notificationService.SendMessageToTheUser(user.opponent.ConnectionId, "tick", counter);
 
-        await Clients.Client(user.ConnectionId).SendAsync("opponentFound", anim);
-        await Clients.Client(opponent.ConnectionId).SendAsync("opponentFound", anim);
+        }, 1000);
+        user.MatchInterval = new RestartableInterval(async () => {
+            counter = 0;
+            if (selectedAnime == anim.Count)
+            {
+                counter = 0;
+                selectedAnime = 0;
+                user.MatchInterval.Dispose();
+                _tickerInterval.Dispose();
+                await GameEnd(user);
+                return;
+            }
+            var date = DateTime.Now;
+            var anime = anim.ElementAt(selectedAnime);
+            anime.TimeSent = date;
+            await _notificationService.SendMessageToTheUser(user.ConnectionId, "nextQuestion", anime);
+            await _notificationService.SendMessageToTheUser(user.opponent.ConnectionId, "nextQuestion", anime);
+            selectedAnime++;
+        }, 15000);
+
+        user.opponent.MatchInterval = user.MatchInterval;
+        user.MatchInterval.Start();
+        _tickerInterval.Start();
+
     }
 
 
-    public async Task Next()
+    public async Task Next(int points)
     {
         var user = users.FirstOrDefault((u => u.ConnectionId == Context.ConnectionId));
         if (user != null)
         {
-            await Clients.Client(user.ConnectionId).SendAsync("nextQuestion");
-            await Clients.Client(user.opponent.ConnectionId).SendAsync("nextQuestion");
-        }
+            user.Result += points;
+            Console.WriteLine(user.Result);
+            if (user.MatchInterval != null)
+            {
+                user.MatchInterval.Restart();
+            }
 
-        ;
+        };
     }
 
-    public async Task GameEnd(int result)
+    private  async Task GameEnd(Player user)
     {
-        var user = users.FirstOrDefault((u => u.ConnectionId == Context.ConnectionId));
-        user.Result = result;
-        if (user.Result != null && user.opponent.Result != null)
+        if (user != null)
         {
             var userResponse = new GameEndResult();
             userResponse.UserResult = (int)user.Result;
@@ -145,13 +181,11 @@ public class SignarlRHub : Hub
             var oppoentResoponse = new GameEndResult();
             oppoentResoponse.UserResult = (int)user.opponent.Result;
             oppoentResoponse.OpponentResult = (int)user.Result;
-
-            await Clients.Client(user.ConnectionId).SendAsync("gameResult", userResponse);
-            await Clients.Client(user.opponent.ConnectionId).SendAsync("gameResult", oppoentResoponse);
+            selectedAnime = 0;
+            await _notificationService.SendMessageToTheUser(user.ConnectionId, "gameResult", userResponse);
+            await _notificationService.SendMessageToTheUser(user.opponent.ConnectionId, "gameResult", oppoentResoponse);
             users.Remove(user);
             users.Remove(user.opponent);
-        }
-
-        ;
+        };
     }
 }

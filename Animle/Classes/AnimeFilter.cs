@@ -6,6 +6,7 @@
         public string Thumbnail { get; set; }
         public string Title { get; set; }
 
+        public DateTime TimeSent { get; set; }
         public string Image { get; set; }
         public string? JapaneseTitle { get; set; }
         public object? Description { get; set; }
